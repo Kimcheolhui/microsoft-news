@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 import uuid
 from datetime import datetime, timezone
 
@@ -11,15 +12,22 @@ from sqlalchemy.orm import Session
 from .models import Source, Update, IngestRun
 from .scrapers import get_scraper
 from .utils.dedup import find_existing_urls
+from .utils.monitoring import check_consecutive_failures
 
 logger = logging.getLogger(__name__)
 
 
-def run_ingest(source_name: str, session: Session) -> IngestRun:
-    """Run ingest for a single source.
+def run_ingest(
+    source_name: str,
+    session: Session,
+    max_retries: int = 2,
+) -> IngestRun:
+    """Run ingest for a single source with retry logic.
 
     Creates an IngestRun record, invokes the scraper, upserts updates,
-    and returns the completed IngestRun.
+    and returns the completed IngestRun.  If the scraper returns zero
+    items, the engine retries up to *max_retries* times before recording
+    a failure.
     """
     # 1. Look up or create Source
     source = session.query(Source).filter_by(name=source_name).first()
@@ -36,10 +44,54 @@ def run_ingest(source_name: str, session: Session) -> IngestRun:
     session.add(run)
     session.flush()
 
+    retry_errors: list[dict] = []
+
     try:
-        # 3. Invoke scraper
+        # 3. Invoke scraper with retries
         scraper = get_scraper(source_name)
-        items = scraper.scrape()
+        items: list[dict] = []
+
+        for attempt in range(max_retries + 1):
+            try:
+                items = scraper.scrape()
+            except Exception as exc:
+                retry_errors.append(
+                    {"attempt": attempt + 1, "error": str(exc), "type": "exception"}
+                )
+                logger.warning(
+                    "Scraper %s attempt %d/%d raised: %s",
+                    source_name,
+                    attempt + 1,
+                    max_retries + 1,
+                    exc,
+                )
+                if attempt < max_retries:
+                    time.sleep(2 ** attempt)
+                    continue
+                raise
+
+            if items:
+                break
+
+            # Empty results — retry unless exhausted
+            retry_errors.append(
+                {"attempt": attempt + 1, "error": "empty results", "type": "empty"}
+            )
+            if attempt < max_retries:
+                logger.info(
+                    "Scraper %s returned 0 items, retrying (%d/%d)",
+                    source_name,
+                    attempt + 1,
+                    max_retries,
+                )
+                time.sleep(2 ** attempt)
+            else:
+                logger.warning(
+                    "Scraper %s returned 0 items after %d attempts",
+                    source_name,
+                    max_retries + 1,
+                )
+
         run.items_found = len(items)
 
         # 4. Dedup and upsert
@@ -81,6 +133,8 @@ def run_ingest(source_name: str, session: Session) -> IngestRun:
         run.items_updated = items_updated
         run.status = "success"
         run.finished_at = datetime.now(timezone.utc)
+        if retry_errors:
+            run.errors = {"retries": retry_errors}
 
         # 6. Update source timestamp
         source.last_scraped_at = datetime.now(timezone.utc)
@@ -98,7 +152,13 @@ def run_ingest(source_name: str, session: Session) -> IngestRun:
         logger.exception("Ingest failed for %s", source_name)
         run.status = "failed"
         run.finished_at = datetime.now(timezone.utc)
-        run.errors = {"error": str(exc)}
+        run.errors = {"error": str(exc), "retries": retry_errors}
         session.flush()
+
+    # 7. Check for consecutive failure alert
+    try:
+        check_consecutive_failures(session, source_name)
+    except Exception:
+        logger.debug("Could not check consecutive failures", exc_info=True)
 
     return run

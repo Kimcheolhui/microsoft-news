@@ -12,6 +12,11 @@ load_dotenv()
 class Settings:
     database_url: str
     log_level: str = "INFO"
+    http_max_retries: int = 3
+    http_backoff_factor: float = 0.5
+    http_timeout: int = 30
+    engine_max_retries: int = 2
+    consecutive_failure_threshold: int = 3
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -21,6 +26,13 @@ class Settings:
         return cls(
             database_url=database_url,
             log_level=os.environ.get("LOG_LEVEL", "INFO"),
+            http_max_retries=int(os.environ.get("HTTP_MAX_RETRIES", "3")),
+            http_backoff_factor=float(os.environ.get("HTTP_BACKOFF_FACTOR", "0.5")),
+            http_timeout=int(os.environ.get("HTTP_TIMEOUT", "30")),
+            engine_max_retries=int(os.environ.get("ENGINE_MAX_RETRIES", "2")),
+            consecutive_failure_threshold=int(
+                os.environ.get("CONSECUTIVE_FAILURE_THRESHOLD", "3")
+            ),
         )
 
 

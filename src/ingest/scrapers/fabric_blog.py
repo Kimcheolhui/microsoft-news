@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 from urllib.parse import urljoin
 
 import feedparser
-import requests
 from bs4 import BeautifulSoup
 
 from .base import BaseScraper
@@ -55,9 +54,9 @@ class FabricBlogScraper(BaseScraper):
 
         logger.info("Trying Fabric Blog RSS feed: %s", feed_url)
         try:
-            resp = requests.get(feed_url, timeout=REQUEST_TIMEOUT)
+            resp = self._http.get(feed_url)
             resp.raise_for_status()
-        except requests.RequestException as exc:
+        except Exception as exc:
             logger.warning("Could not fetch blog RSS feed: %s", exc)
             return []
 
@@ -88,9 +87,9 @@ class FabricBlogScraper(BaseScraper):
     def _discover_feed_url(self) -> str | None:
         """Look for an RSS <link> tag in the blog HTML head."""
         try:
-            resp = requests.get(BLOG_URL, timeout=REQUEST_TIMEOUT)
+            resp = self._http.get(BLOG_URL)
             resp.raise_for_status()
-        except requests.RequestException:
+        except Exception:
             return None
 
         soup = BeautifulSoup(resp.text, "html.parser")
@@ -108,11 +107,11 @@ class FabricBlogScraper(BaseScraper):
         for path in COMMON_FEED_PATHS:
             url = urljoin(BLOG_URL, path)
             try:
-                resp = requests.get(url, timeout=REQUEST_TIMEOUT)
+                resp = self._http.get(url)
                 if resp.ok and ("xml" in resp.headers.get("content-type", "") or "<rss" in resp.text[:500]):
                     logger.info("Found feed at common path: %s", url)
                     return url
-            except requests.RequestException:
+            except Exception:
                 continue
         return None
 
@@ -123,9 +122,9 @@ class FabricBlogScraper(BaseScraper):
     def _try_html(self) -> list[dict]:
         logger.info("Scraping Fabric Blog HTML: %s", BLOG_URL)
         try:
-            resp = requests.get(BLOG_URL, timeout=REQUEST_TIMEOUT)
+            resp = self._http.get(BLOG_URL)
             resp.raise_for_status()
-        except requests.RequestException as exc:
+        except Exception as exc:
             logger.error("Failed to fetch blog page: %s", exc)
             return []
 

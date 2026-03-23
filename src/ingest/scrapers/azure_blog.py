@@ -6,7 +6,6 @@ import logging
 from datetime import datetime, timezone
 
 import feedparser
-import requests
 from bs4 import BeautifulSoup
 
 from .base import BaseScraper
@@ -50,9 +49,9 @@ class AzureBlogScraper(BaseScraper):
 
         logger.info("Trying Azure Blog RSS feed: %s", feed_url)
         try:
-            resp = requests.get(feed_url, timeout=REQUEST_TIMEOUT)
+            resp = self._http.get(feed_url)
             resp.raise_for_status()
-        except requests.RequestException as exc:
+        except Exception as exc:
             logger.warning("Could not fetch blog RSS feed: %s", exc)
             return []
 
@@ -83,9 +82,9 @@ class AzureBlogScraper(BaseScraper):
     def _discover_feed_url(self) -> str | None:
         """Look for an RSS <link> tag in the blog HTML head."""
         try:
-            resp = requests.get(BLOG_URL, timeout=REQUEST_TIMEOUT)
+            resp = self._http.get(BLOG_URL)
             resp.raise_for_status()
-        except requests.RequestException:
+        except Exception:
             return None
 
         soup = BeautifulSoup(resp.text, "html.parser")
@@ -105,9 +104,9 @@ class AzureBlogScraper(BaseScraper):
     def _try_html(self) -> list[dict]:
         logger.info("Scraping Azure Blog HTML: %s", BLOG_URL)
         try:
-            resp = requests.get(BLOG_URL, timeout=REQUEST_TIMEOUT)
+            resp = self._http.get(BLOG_URL)
             resp.raise_for_status()
-        except requests.RequestException as exc:
+        except Exception as exc:
             logger.error("Failed to fetch blog page: %s", exc)
             return []
 

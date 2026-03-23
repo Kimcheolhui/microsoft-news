@@ -187,5 +187,37 @@ def runs(last_n: int):
             )
 
 
+# ------------------------------------------------------------------
+# health command
+# ------------------------------------------------------------------
+
+
+@cli.command()
+def health():
+    """Show health status for all ingest sources."""
+    from .db.session import get_session
+    from .utils.monitoring import get_health_summary
+
+    with get_session() as session:
+        summary = get_health_summary(session)
+
+    if not summary:
+        click.echo("No sources configured. Run 'ingest sources seed' first.")
+        return
+
+    header = (
+        f"{'Source':<25} {'Status':<10} {'Last Run':<22} "
+        f"{'Consecutive Failures':>21} {'Total Runs':>11}"
+    )
+    click.echo(header)
+    click.echo("─" * len(header))
+    for entry in summary:
+        last_time = entry["last_run_time"][:19] if entry["last_run_time"] else "never"
+        click.echo(
+            f"{entry['name']:<25} {entry['last_run_status']:<10} {last_time:<22} "
+            f"{entry['consecutive_failures']:>21} {entry['total_runs']:>11}"
+        )
+
+
 if __name__ == "__main__":
     cli()

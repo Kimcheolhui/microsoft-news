@@ -6,7 +6,6 @@ import logging
 from datetime import datetime, timezone
 
 import feedparser
-import requests
 
 from .base import BaseScraper
 from ..utils.parsing import parse_datetime, strip_html
@@ -27,9 +26,9 @@ class AzureUpdatesRssScraper(BaseScraper):
     def scrape(self) -> list[dict]:
         logger.info("Fetching Azure Updates RSS feed: %s", FEED_URL)
         try:
-            resp = requests.get(FEED_URL, timeout=REQUEST_TIMEOUT)
+            resp = self._http.get(FEED_URL)
             resp.raise_for_status()
-        except requests.RequestException as exc:
+        except Exception as exc:
             logger.error("Failed to fetch RSS feed: %s", exc)
             return []
 
