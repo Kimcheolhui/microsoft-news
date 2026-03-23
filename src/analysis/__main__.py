@@ -31,18 +31,38 @@ def generate():
 @click.argument("update_id")
 def generate_update(update_id: str):
     """Generate a report for a single update by ID."""
+    import asyncio
+
+    from .pipeline.orchestrator import run_pipeline
+
     click.echo(f"Generating report for update {update_id}...")
-    # TODO: call pipeline orchestrator
-    click.echo("Not yet implemented.")
+    try:
+        result = asyncio.run(run_pipeline(update_id))
+    except ValueError as exc:
+        click.echo(f"Error: {exc}", err=True)
+        raise SystemExit(1)
+
+    if result["status"] == "completed":
+        click.echo(f"✓ Report generated (ID: {result['report_id']})")
+        if result.get("title_en"):
+            click.echo(f"  EN: {result['title_en']}")
+        if result.get("title_ko"):
+            click.echo(f"  KO: {result['title_ko']}")
+    else:
+        click.echo(f"✗ Pipeline failed: {result.get('error')}", err=True)
+        raise SystemExit(1)
 
 
 @generate.command("pending")
 def generate_pending():
     """Generate reports for all updates without reports."""
+    import asyncio
+
     from ingest.db.session import get_session
     from ingest.models import Update
 
     from .models import Report
+    from .pipeline.orchestrator import run_pipeline
 
     with get_session() as session:
         existing_ids = {
@@ -51,19 +71,77 @@ def generate_pending():
         pending = (
             session.query(Update)
             .filter(~Update.id.in_(existing_ids))
+            .order_by(Update.published_date.desc().nullslast())
             .all()
         )
-        click.echo(f"Found {len(pending)} updates without reports.")
-        # TODO: call pipeline orchestrator for each
-        click.echo("Not yet implemented.")
+        pending_ids = [(str(u.id), u.title) for u in pending]
+
+    if not pending_ids:
+        click.echo("No pending updates — all reports are up to date.")
+        return
+
+    click.echo(f"Found {len(pending_ids)} updates without reports.")
+    completed = 0
+    failed = 0
+
+    for uid, title in pending_ids:
+        click.echo(f"  Processing: {title[:80]}...")
+        try:
+            result = asyncio.run(run_pipeline(uid))
+            if result["status"] == "completed":
+                completed += 1
+                click.echo(f"    ✓ Done")
+            else:
+                failed += 1
+                click.echo(f"    ✗ Failed: {result.get('error', 'unknown')}")
+        except Exception as exc:
+            failed += 1
+            click.echo(f"    ✗ Error: {exc}")
+
+    click.echo(f"\nCompleted: {completed}, Failed: {failed}, Total: {len(pending_ids)}")
 
 
 @generate.command("all")
 def generate_all():
     """Regenerate reports for all updates."""
-    click.echo("Regenerating all reports...")
-    # TODO: call pipeline orchestrator for all
-    click.echo("Not yet implemented.")
+    import asyncio
+
+    from ingest.db.session import get_session
+    from ingest.models import Update
+
+    from .pipeline.orchestrator import run_pipeline
+
+    with get_session() as session:
+        updates = (
+            session.query(Update)
+            .order_by(Update.published_date.desc().nullslast())
+            .all()
+        )
+        all_ids = [(str(u.id), u.title) for u in updates]
+
+    if not all_ids:
+        click.echo("No updates found in the database.")
+        return
+
+    click.echo(f"Regenerating reports for {len(all_ids)} updates...")
+    completed = 0
+    failed = 0
+
+    for uid, title in all_ids:
+        click.echo(f"  Processing: {title[:80]}...")
+        try:
+            result = asyncio.run(run_pipeline(uid))
+            if result["status"] == "completed":
+                completed += 1
+                click.echo(f"    ✓ Done")
+            else:
+                failed += 1
+                click.echo(f"    ✗ Failed: {result.get('error', 'unknown')}")
+        except Exception as exc:
+            failed += 1
+            click.echo(f"    ✗ Error: {exc}")
+
+    click.echo(f"\nCompleted: {completed}, Failed: {failed}, Total: {len(all_ids)}")
 
 
 @cli.command()
