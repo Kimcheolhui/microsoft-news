@@ -37,24 +37,22 @@ def generate_update(update_id: str):
 
     click.echo(f"Generating report for update {update_id}...")
     try:
-        result = asyncio.run(run_pipeline(update_id))
-    except ValueError as exc:
-        click.echo(f"Error: {exc}", err=True)
+        report = asyncio.run(run_pipeline(update_id))
+        click.echo(
+            f"✅ Report {report.status}: "
+            f"{report.title_en or report.title_ko or 'N/A'}"
+        )
+    except ValueError as e:
+        click.echo(f"❌ {e}", err=True)
         raise SystemExit(1)
-
-    if result["status"] == "completed":
-        click.echo(f"✓ Report generated (ID: {result['report_id']})")
-        if result.get("title_en"):
-            click.echo(f"  EN: {result['title_en']}")
-        if result.get("title_ko"):
-            click.echo(f"  KO: {result['title_ko']}")
-    else:
-        click.echo(f"✗ Pipeline failed: {result.get('error')}", err=True)
+    except Exception as e:
+        click.echo(f"❌ Pipeline failed: {e}", err=True)
         raise SystemExit(1)
 
 
 @generate.command("pending")
-def generate_pending():
+@click.option("--dry-run", is_flag=True, help="Show what would be processed without running.")
+def generate_pending(dry_run: bool):
     """Generate reports for all updates without reports."""
     import asyncio
 
@@ -68,80 +66,91 @@ def generate_pending():
         existing_ids = {
             r.update_id for r in session.query(Report.update_id).all()
         }
-        pending = (
-            session.query(Update)
-            .filter(~Update.id.in_(existing_ids))
-            .order_by(Update.published_date.desc().nullslast())
-            .all()
-        )
-        pending_ids = [(str(u.id), u.title) for u in pending]
+        query = session.query(Update)
+        if existing_ids:
+            query = query.filter(~Update.id.in_(existing_ids))
+        updates = [(u.id, u.title) for u in query.all()]
 
-    if not pending_ids:
-        click.echo("No pending updates — all reports are up to date.")
+    click.echo(f"Found {len(updates)} updates to process.")
+
+    if not updates:
         return
 
-    click.echo(f"Found {len(pending_ids)} updates without reports.")
-    completed = 0
-    failed = 0
+    if dry_run:
+        for uid, title in updates:
+            click.echo(f"  Would process: {title} ({uid})")
+        return
 
-    for uid, title in pending_ids:
-        click.echo(f"  Processing: {title[:80]}...")
+    completed = failed = skipped = 0
+    for i, (uid, title) in enumerate(updates, 1):
+        click.echo(f"[{i}/{len(updates)}] Processing: {title}...")
         try:
-            result = asyncio.run(run_pipeline(uid))
-            if result["status"] == "completed":
+            report = asyncio.run(run_pipeline(uid))
+            if report.status == "completed":
+                click.echo("  ✅ Completed")
                 completed += 1
-                click.echo(f"    ✓ Done")
             else:
+                click.echo(f"  ❌ Failed: {report.status}")
                 failed += 1
-                click.echo(f"    ✗ Failed: {result.get('error', 'unknown')}")
-        except Exception as exc:
+        except Exception as e:
+            click.echo(f"  ❌ Failed: {e}")
             failed += 1
-            click.echo(f"    ✗ Error: {exc}")
 
-    click.echo(f"\nCompleted: {completed}, Failed: {failed}, Total: {len(pending_ids)}")
+    click.echo(f"\nDone: {completed} completed, {failed} failed, {skipped} skipped")
 
 
 @generate.command("all")
-def generate_all():
+@click.option("--force", is_flag=True, help="Regenerate even completed reports.")
+def generate_all(force: bool):
     """Regenerate reports for all updates."""
     import asyncio
 
     from ingest.db.session import get_session
     from ingest.models import Update
 
+    from .models import Report
     from .pipeline.orchestrator import run_pipeline
 
     with get_session() as session:
-        updates = (
-            session.query(Update)
-            .order_by(Update.published_date.desc().nullslast())
-            .all()
-        )
-        all_ids = [(str(u.id), u.title) for u in updates]
+        if force:
+            # Reset completed reports so the pipeline reprocesses them
+            session.query(Report).filter(
+                Report.status == "completed",
+            ).update({"status": "pending"})
+            updates = [(u.id, u.title) for u in session.query(Update).all()]
+        else:
+            completed_ids = {
+                r.update_id
+                for r in session.query(Report.update_id)
+                .filter(Report.status == "completed")
+                .all()
+            }
+            query = session.query(Update)
+            if completed_ids:
+                query = query.filter(~Update.id.in_(completed_ids))
+            updates = [(u.id, u.title) for u in query.all()]
 
-    if not all_ids:
-        click.echo("No updates found in the database.")
+    click.echo(f"Found {len(updates)} updates to process.")
+
+    if not updates:
         return
 
-    click.echo(f"Regenerating reports for {len(all_ids)} updates...")
-    completed = 0
-    failed = 0
-
-    for uid, title in all_ids:
-        click.echo(f"  Processing: {title[:80]}...")
+    completed = failed = skipped = 0
+    for i, (uid, title) in enumerate(updates, 1):
+        click.echo(f"[{i}/{len(updates)}] Processing: {title}...")
         try:
-            result = asyncio.run(run_pipeline(uid))
-            if result["status"] == "completed":
+            report = asyncio.run(run_pipeline(uid))
+            if report.status == "completed":
+                click.echo("  ✅ Completed")
                 completed += 1
-                click.echo(f"    ✓ Done")
             else:
+                click.echo(f"  ❌ Failed: {report.status}")
                 failed += 1
-                click.echo(f"    ✗ Failed: {result.get('error', 'unknown')}")
-        except Exception as exc:
+        except Exception as e:
+            click.echo(f"  ❌ Failed: {e}")
             failed += 1
-            click.echo(f"    ✗ Error: {exc}")
 
-    click.echo(f"\nCompleted: {completed}, Failed: {failed}, Total: {len(all_ids)}")
+    click.echo(f"\nDone: {completed} completed, {failed} failed, {skipped} skipped")
 
 
 @cli.command()
