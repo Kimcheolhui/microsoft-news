@@ -6,11 +6,13 @@ from .base import BaseScraper
 from .azure_updates_rss import AzureUpdatesRssScraper
 from .azure_blog import AzureBlogScraper
 from .fabric_blog import FabricBlogScraper
+from .github_blog import GitHubBlogScraper
 
 SCRAPERS: dict[str, type[BaseScraper]] = {
     "azure-updates-rss": AzureUpdatesRssScraper,
     "azure-blog": AzureBlogScraper,
     "fabric-blog": FabricBlogScraper,
+    "github-blog": GitHubBlogScraper,
 }
 
 

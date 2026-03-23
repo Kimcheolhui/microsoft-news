@@ -31,7 +31,6 @@ DEFAULT_SOURCES = [
         "name": "github-blog",
         "url": "https://github.blog/",
         "source_type": "web",
-        "enabled": False,
     },
 ]
 
