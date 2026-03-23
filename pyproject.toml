@@ -16,6 +16,7 @@ dependencies = [
     "feedparser",
     "click",
     "python-dotenv",
+    "python-dateutil",
 ]
 
 [project.optional-dependencies]
