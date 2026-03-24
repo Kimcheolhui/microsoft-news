@@ -172,53 +172,12 @@
 			class="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm
 				focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
 		/>
-		<select
-			bind:value={selectedSource}
-			onchange={applyFilters}
-			class="shrink-0 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm bg-white
-				focus:border-[var(--color-primary)] focus:outline-none"
-		>
-			<option value="">모든 소스</option>
-			{#each sources as source}
-				<option value={source.id}>{source.display_name || source.name}</option>
-			{/each}
-		</select>
-		<select
-			bind:value={selectedType}
-			onchange={applyFilters}
-			class="shrink-0 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm bg-white
-				focus:border-[var(--color-primary)] focus:outline-none"
-		>
-			<option value="">모든 유형</option>
-			{#each updateTypes as type}
-				<option value={type}>{typeLabel(type)}</option>
-			{/each}
-		</select>
-		<select
-			bind:value={selectedCategory}
-			onchange={applyFilters}
-			class="shrink-0 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm bg-white
-				focus:border-[var(--color-primary)] focus:outline-none"
-		>
-			<option value="">모든 카테고리</option>
-			{#each categories as cat}
-				<option value={cat}>{categoryLabel(cat)}</option>
-			{/each}
-		</select>
-	</div>
-	<div class="flex items-center gap-2">
-		<DateRangePicker
-			bind:this={datePickerRef}
-			{dateFrom}
-			{dateTo}
-			onchange={(from, to) => { dateFrom = from; dateTo = to; applyFilters(); }}
-		/>
 		<button
 			onclick={applyFilters}
-			class="shrink-0 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white
+			class="shrink-0 rounded-lg bg-[var(--color-primary)] px-5 py-2 text-sm font-medium text-white
 				hover:bg-[var(--color-primary-hover)] transition-colors"
 		>
-			검색
+			적용
 		</button>
 		{#if searchQuery || selectedSource || selectedType || selectedCategory || dateFrom || dateTo}
 			<button
@@ -229,6 +188,44 @@
 				초기화
 			</button>
 		{/if}
+	</div>
+	<div class="flex items-center gap-2">
+		<select
+			bind:value={selectedSource}
+			class="w-0 flex-1 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm bg-white
+				focus:border-[var(--color-primary)] focus:outline-none"
+		>
+			<option value="">모든 소스</option>
+			{#each sources as source}
+				<option value={source.id}>{source.display_name || source.name}</option>
+			{/each}
+		</select>
+		<select
+			bind:value={selectedType}
+			class="w-0 flex-1 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm bg-white
+				focus:border-[var(--color-primary)] focus:outline-none"
+		>
+			<option value="">모든 유형</option>
+			{#each updateTypes as type}
+				<option value={type}>{typeLabel(type)}</option>
+			{/each}
+		</select>
+		<select
+			bind:value={selectedCategory}
+			class="w-0 flex-1 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm bg-white
+				focus:border-[var(--color-primary)] focus:outline-none"
+		>
+			<option value="">모든 카테고리</option>
+			{#each categories as cat}
+				<option value={cat}>{categoryLabel(cat)}</option>
+			{/each}
+		</select>
+		<DateRangePicker
+			bind:this={datePickerRef}
+			{dateFrom}
+			{dateTo}
+			onchange={(from, to) => { dateFrom = from; dateTo = to; }}
+		/>
 		<span class="ml-auto text-sm text-[var(--color-text-muted)]">
 			총 <strong class="text-[var(--color-text)]">{total}</strong>건
 		</span>
