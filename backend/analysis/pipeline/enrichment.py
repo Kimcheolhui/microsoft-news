@@ -29,7 +29,7 @@ async def enrich_update(session, update: Update, source_name: str) -> dict | Non
     """Enrich a single update via LLM. Returns parsed result or None on failure."""
     prompt = build_enrichment_prompt(
         title=update.title,
-        summary=update.summary,
+        body=update.body,
         source_name=source_name,
         published_date=str(update.published_date) if update.published_date else None,
     )
@@ -49,8 +49,9 @@ async def enrich_update(session, update: Update, source_name: str) -> dict | Non
         "update_types": _validate_list(result.get("update_types"), UPDATE_TYPES),
         "categories": _validate_list(result.get("categories"), CATEGORIES),
         "services_affected": result.get("services_affected") or [],
-        "title_ko": result.get("title_ko") or "",
+        "summary": result.get("summary") or "",
         "summary_ko": result.get("summary_ko") or "",
+        "title_ko": result.get("title_ko") or "",
     }
 
 
@@ -59,8 +60,9 @@ def apply_enrichment(db: Session, update: Update, data: dict) -> None:
     update.update_type = data["update_types"]
     update.categories = data["categories"]
     update.services_affected = data["services_affected"]
-    update.title_ko = data["title_ko"]
+    update.summary = data["summary"]
     update.summary_ko = data["summary_ko"]
+    update.title_ko = data["title_ko"]
     db.commit()
     logger.info("Enriched update %s: types=%s categories=%s",
                 update.id, data["update_types"], data["categories"])

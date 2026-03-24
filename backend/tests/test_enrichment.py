@@ -47,9 +47,9 @@ class TestValidateList:
 
 class TestPrompt:
     def test_build_prompt_includes_title(self):
-        prompt = build_enrichment_prompt("AKS Update", "New feature", "azure-updates-rss", "2026-03-24")
+        prompt = build_enrichment_prompt("AKS Update", "New feature body text", "azure-updates-rss", "2026-03-24")
         assert "AKS Update" in prompt
-        assert "New feature" in prompt
+        assert "New feature body text" in prompt
         assert "azure-updates-rss" in prompt
 
     def test_build_prompt_includes_enum_values(self):
@@ -61,7 +61,7 @@ class TestPrompt:
 
     def test_build_prompt_handles_none(self):
         prompt = build_enrichment_prompt("Test", None, "test", None)
-        assert "(no summary)" in prompt
+        assert "(no content)" in prompt
         assert "unknown" in prompt
 
     def test_system_prompt_exists(self):
@@ -75,7 +75,7 @@ class TestEnrichUpdate:
         class FakeUpdate:
             id = "test-id"
             title = "Azure Kubernetes Service now supports GPU"
-            summary = "AKS adds GPU node pools for ML workloads"
+            body = "AKS adds GPU node pools for ML workloads. This enables data scientists to run training jobs directly on AKS."
             published_date = "2026-03-24"
         return FakeUpdate()
 
@@ -84,6 +84,7 @@ class TestEnrichUpdate:
             "update_types": ["new_feature"],
             "categories": ["compute", "ai_ml"],
             "services_affected": ["Azure Kubernetes Service"],
+            "summary": "AKS now supports GPU node pools for ML workloads.",
             "title_ko": "Azure Kubernetes Service에 GPU 지원 추가",
             "summary_ko": "AKS에서 ML 워크로드를 위한 GPU 노드 풀 추가"
         })
@@ -104,6 +105,7 @@ class TestEnrichUpdate:
             "update_types": ["new_feature", "invalid_type"],
             "categories": ["compute", "invalid_cat"],
             "services_affected": ["AKS"],
+            "summary": "Test summary",
             "title_ko": "테스트",
             "summary_ko": "테스트 요약"
         })
@@ -127,6 +129,7 @@ class TestEnrichUpdate:
             "update_types": ["new_feature", "preview"],
             "categories": ["ai_ml", "security"],
             "services_affected": ["Azure OpenAI", "Azure Key Vault"],
+            "summary": "Test",
             "title_ko": "테스트",
             "summary_ko": "테스트"
         })
