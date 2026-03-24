@@ -184,7 +184,7 @@ def test_list_updates_filter_by_source():
     _make_update(db, src2, title="From B")
     db.close()
 
-    resp = client.get(f"/api/v1/updates?source_id={src1.id}")
+    resp = client.get("/api/v1/updates?source=src-a")
     data = resp.json()
     assert data["total"] == 1
     assert data["items"][0]["title"] == "From A"

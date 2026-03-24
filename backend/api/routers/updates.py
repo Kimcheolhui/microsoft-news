@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from api.deps import get_db
 from api.schemas import UpdateDetailOut, UpdateListOut, UpdateSummaryOut
+from ingest.models.source import Source
 from ingest.models.update import Update
 
 router = APIRouter(prefix="/updates", tags=["updates"])
@@ -21,7 +22,7 @@ router = APIRouter(prefix="/updates", tags=["updates"])
 def list_updates(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
-    source_id: UUID | None = None,
+    source: str | None = None,
     update_type: str | None = None,
     category: str | None = None,
     q: str | None = None,
@@ -31,8 +32,10 @@ def list_updates(
 ) -> UpdateListOut:
     stmt = select(Update)
 
-    if source_id:
-        stmt = stmt.where(Update.source_id == source_id)
+    if source:
+        stmt = stmt.join(Source, Update.source_id == Source.id).where(
+            Source.name == source
+        )
     if update_type:
         stmt = stmt.where(Update.update_type.contains(cast([update_type], JSONB)))
     if category:

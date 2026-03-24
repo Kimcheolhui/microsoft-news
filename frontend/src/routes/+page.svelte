@@ -55,7 +55,7 @@
 	];
 
 	let sourceOptions = $derived(
-		sources.map((s) => ({ value: s.id, label: s.display_name || s.name }))
+		sources.map((s) => ({ value: s.name, label: s.display_name || s.name }))
 	);
 
 	let totalPages = $derived(Math.ceil(total / pageSize));
@@ -80,7 +80,7 @@
 			const data = await getUpdates({
 				page: parseInt(params.get('page') || '1', 10),
 				page_size: pageSize,
-				source_id: params.get('source') || undefined,
+				source: params.get('source') || undefined,
 				update_type: params.get('type') || undefined,
 				category: params.get('category') || undefined,
 				q: params.get('q') || undefined,

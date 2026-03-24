@@ -98,7 +98,7 @@ export interface Source {
 export function getUpdates(params: {
 	page?: number;
 	page_size?: number;
-	source_id?: string;
+	source?: string;
 	update_type?: string;
 	category?: string;
 	q?: string;
@@ -108,7 +108,7 @@ export function getUpdates(params: {
 	const qs = new URLSearchParams();
 	if (params.page) qs.set('page', String(params.page));
 	if (params.page_size) qs.set('page_size', String(params.page_size));
-	if (params.source_id) qs.set('source_id', params.source_id);
+	if (params.source) qs.set('source', params.source);
 	if (params.update_type) qs.set('update_type', params.update_type);
 	if (params.category) qs.set('category', params.category);
 	if (params.q) qs.set('q', params.q);
