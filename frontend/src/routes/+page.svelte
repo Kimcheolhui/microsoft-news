@@ -85,7 +85,22 @@
 	}
 
 	function capitalize(s: string): string {
-		return s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ');
+		const labels: Record<string, string> = {
+			compute: 'Compute',
+			database: 'Database',
+			ai_ml: 'AI/ML',
+			networking: 'Networking',
+			storage: 'Storage',
+			security: 'Security',
+			devtools: 'DevTools',
+			analytics: 'Analytics',
+			integration: 'Integration',
+			management: 'Management',
+			iot: 'IoT',
+			mixed_reality: 'Mixed Reality',
+			other: 'Other'
+		};
+		return labels[s] ?? s;
 	}
 
 	function typeLabel(type: string): string {
