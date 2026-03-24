@@ -5,7 +5,8 @@ from __future__ import annotations
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, select
+from sqlalchemy import cast, func, select
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session, joinedload
 
 from api.deps import get_db
@@ -29,9 +30,12 @@ def list_updates(
     if source_id:
         stmt = stmt.where(Update.source_id == source_id)
     if update_type:
-        stmt = stmt.where(Update.update_type == update_type)
+        # update_type is a JSONB list — use contains operator
+        stmt = stmt.where(Update.update_type.contains(cast([update_type], JSONB)))
     if q:
-        stmt = stmt.where(Update.title.ilike(f"%{q}%"))
+        stmt = stmt.where(
+            Update.title.ilike(f"%{q}%") | Update.title_ko.ilike(f"%{q}%")
+        )
 
     total = db.scalar(
         select(func.count()).select_from(stmt.subquery())
