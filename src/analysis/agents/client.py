@@ -48,9 +48,11 @@ async def create_analysis_session(
 
     provider: ProviderConfig = {
         "type": "openai",
-        "base_url": settings.openai_base_url,
-        "api_key": settings.openai_api_key,
+        "base_url": settings.base_url,
+        "api_key": settings.api_key,
     }
+    if settings.provider_type == "azure":
+        provider["wire_api"] = "responses"
 
     kwargs: dict[str, Any] = {
         "on_permission_request": PermissionHandler.approve_all,
