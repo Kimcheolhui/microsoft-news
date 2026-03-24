@@ -48,7 +48,7 @@ wheels = [
 ]
 
 [[package]]
-name = "azure-ingest"
+name = "azure-news"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "azure-ingest"
+name = "azure-news"
 version = "0.1.0"
 description = "Data ingestion pipeline for Azure updates"
 requires-python = ">=3.11"

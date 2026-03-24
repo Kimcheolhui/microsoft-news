@@ -63,7 +63,7 @@
 </script>
 
 <svelte:head>
-	<title>{update?.title ?? 'Loading...'} — Azure Ingest</title>
+	<title>{update?.title ?? 'Loading...'} — Azure News</title>
 </svelte:head>
 
 {#if loading}

@@ -1,4 +1,4 @@
-# azure-ingest
+# Azure News
 
 Data ingestion pipeline that scrapes Azure-ecosystem updates from multiple sources and stores them in PostgreSQL.
 

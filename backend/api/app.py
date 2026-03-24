@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers import reports, sources, stats, updates
 
 app = FastAPI(
-    title="Azure Ingest API",
+    title="Azure News API",
     version="0.1.0",
     description="REST API for Azure ecosystem updates and analysis reports",
 )
