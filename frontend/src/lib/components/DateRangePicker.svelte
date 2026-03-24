@@ -53,7 +53,7 @@
 	readonly
 	class="box-border w-full rounded-lg bg-white px-3 text-sm cursor-pointer
 		focus:ring-1 focus:ring-[var(--color-primary)] focus:outline-none"
-	style="height: 40px; line-height: 40px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: none;"
+	style="height: 40px; line-height: 40px; box-shadow: 0 1px 6px rgba(0,0,0,0.14); border: none;"
 />
 
 <style>

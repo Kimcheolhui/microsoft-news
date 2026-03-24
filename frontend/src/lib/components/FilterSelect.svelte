@@ -66,7 +66,7 @@
 <style>
 	.filter-select {
 		min-width: 0;
-		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+		box-shadow: 0 1px 6px rgba(0, 0, 0, 0.14);
 		border-radius: 0.5rem;
 	}
 </style>
