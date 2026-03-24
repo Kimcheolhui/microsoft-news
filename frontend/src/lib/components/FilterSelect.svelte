@@ -43,14 +43,14 @@
 		clearable
 		searchable={false}
 		--border-radius="0.5rem"
-		--border="1px solid var(--color-border)"
-		--border-hover="1px solid var(--color-primary)"
+		--border="none"
+		--border-hover="none"
 		--border-focused="1px solid var(--color-primary)"
 		--background="#fff"
 		--list-background="#fff"
-		--list-border="1px solid var(--color-border)"
+		--list-border="none"
 		--list-border-radius="0.5rem"
-		--list-shadow="0 4px 12px rgba(0,0,0,0.08)"
+		--list-shadow="0 4px 12px rgba(0,0,0,0.1)"
 		--item-hover-bg="rgba(0,120,212,0.06)"
 		--item-is-active-bg="rgba(0,120,212,0.1)"
 		--item-is-active-color="var(--color-text)"
@@ -66,5 +66,7 @@
 <style>
 	.filter-select {
 		min-width: 0;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+		border-radius: 0.5rem;
 	}
 </style>

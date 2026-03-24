@@ -51,9 +51,9 @@
 	type="text"
 	placeholder="날짜 범위 선택"
 	readonly
-	class="box-border w-full rounded-lg border border-[var(--color-border)] px-3 text-sm bg-white cursor-pointer
-		focus:border-[var(--color-primary)] focus:outline-none"
-	style="height: 40px; line-height: 40px;"
+	class="box-border w-full rounded-lg bg-white px-3 text-sm cursor-pointer
+		focus:ring-1 focus:ring-[var(--color-primary)] focus:outline-none"
+	style="height: 40px; line-height: 40px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: none;"
 />
 
 <style>
