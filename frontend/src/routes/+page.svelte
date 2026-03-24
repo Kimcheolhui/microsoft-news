@@ -84,6 +84,10 @@
 		});
 	}
 
+	function capitalize(s: string): string {
+		return s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ');
+	}
+
 	function typeLabel(type: string): string {
 		const labels: Record<string, string> = {
 			new_feature: '🆕 신규',
@@ -133,7 +137,7 @@
 		<h1 class="text-3xl font-bold tracking-tight">Azure News</h1>
 		<p class="mt-2 max-w-xl text-base text-white/85">
 			Azure 생태계의 최신 업데이트, 신규 기능, 보안 공지를 한눈에 확인하세요.<br />
-			AI 기반 자동 분류·한국어 번역과 심층 분석 리포트로 변화의 핵심을 빠르게 파악할 수 있습니다.
+			AI 기반 심층 분석 리포트로 변화의 핵심을 빠르게 파악할 수 있습니다.
 		</p>
 	</div>
 </section>
@@ -217,17 +221,17 @@
 		{#each updates as update}
 			<a
 				href="/updates/{update.id}"
-				class="block rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4
+				class="block rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-5
 					hover:border-[var(--color-primary)] hover:shadow-sm transition-all"
 			>
 				<div class="flex items-start justify-between gap-3">
 					<div class="min-w-0 flex-1">
-						<h3 class="font-medium text-[var(--color-text)] truncate">{update.title_ko || update.title}</h3>
+						<h3 class="text-base font-medium text-[var(--color-text)] truncate">{update.title_ko || update.title}</h3>
 						{#if update.title_ko}
-							<p class="mt-0.5 text-xs text-[var(--color-text-muted)] truncate">{update.title}</p>
+							<p class="mt-1 text-xs text-[var(--color-text-muted)] truncate">{update.title}</p>
 						{/if}
 						{#if update.summary_ko || update.summary}
-							<p class="mt-1 text-sm text-[var(--color-text-muted)] line-clamp-2">{update.summary_ko || update.summary}</p>
+							<p class="mt-2 text-sm text-[var(--color-text-muted)] line-clamp-2">{update.summary_ko || update.summary}</p>
 						{/if}
 					</div>
 					{#if update.update_type && update.update_type.length > 0}
@@ -240,11 +244,11 @@
 						</div>
 					{/if}
 				</div>
-				<div class="mt-2 flex items-center gap-4 text-xs text-[var(--color-text-muted)]">
+				<div class="mt-3 flex items-center gap-4 text-xs text-[var(--color-text-muted)]">
 					<span>{formatDate(update.published_date)}</span>
 					{#if update.categories && update.categories.length > 0}
 						<span>·</span>
-						<span>{update.categories.join(', ')}</span>
+						<span>{update.categories.map(c => capitalize(c)).join(', ')}</span>
 					{/if}
 				</div>
 			</a>
