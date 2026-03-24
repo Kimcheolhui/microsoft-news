@@ -11,6 +11,10 @@ UPDATE_TYPES: list[str] = [
     "security",
     "pricing",
     "deprecation",
+    "guide",
+    "case_study",
+    "announcement",
+    "event",
 ]
 
 CATEGORIES: list[str] = [
@@ -38,6 +42,10 @@ UPDATE_TYPE_LABELS: dict[str, str] = {
     "security": "보안 패치/공지",
     "pricing": "가격 변경",
     "deprecation": "지원 중단 예고",
+    "guide": "가이드/튜토리얼",
+    "case_study": "사용 사례",
+    "announcement": "공지",
+    "event": "이벤트/행사",
 }
 
 CATEGORY_LABELS: dict[str, str] = {

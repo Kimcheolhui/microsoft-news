@@ -15,7 +15,7 @@ from ingest.enums import UPDATE_TYPES, CATEGORIES
 class TestEnums:
     def test_update_types_are_strings(self):
         assert all(isinstance(t, str) for t in UPDATE_TYPES)
-        assert len(UPDATE_TYPES) == 8
+        assert len(UPDATE_TYPES) == 12
         assert "new_feature" in UPDATE_TYPES
         assert "deprecation" in UPDATE_TYPES
 

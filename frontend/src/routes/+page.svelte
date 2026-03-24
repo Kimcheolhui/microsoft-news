@@ -20,7 +20,7 @@
 	let dateTo = $state('');
 	let datePickerRef: DateRangePicker;
 
-	const updateTypes = ['new_feature', 'retirement', 'preview', 'ga', 'update', 'security', 'pricing', 'deprecation'];
+	const updateTypes = ['new_feature', 'retirement', 'preview', 'ga', 'update', 'security', 'pricing', 'deprecation', 'guide', 'case_study', 'announcement', 'event'];
 
 	let totalPages = $derived(Math.ceil(total / pageSize));
 
@@ -93,7 +93,11 @@
 			update: '🔄 업데이트',
 			security: '🔒 보안',
 			pricing: '💰 가격',
-			deprecation: '⚠️ 중단 예고'
+			deprecation: '⚠️ 중단 예고',
+			guide: '📖 가이드',
+			case_study: '💡 사용 사례',
+			announcement: '📢 공지',
+			event: '🎪 이벤트'
 		};
 		return labels[type] ?? type;
 	}
@@ -107,7 +111,11 @@
 			update: 'bg-amber-100 text-amber-800',
 			security: 'bg-purple-100 text-purple-800',
 			pricing: 'bg-orange-100 text-orange-800',
-			deprecation: 'bg-rose-100 text-rose-800'
+			deprecation: 'bg-rose-100 text-rose-800',
+			guide: 'bg-cyan-100 text-cyan-800',
+			case_study: 'bg-teal-100 text-teal-800',
+			announcement: 'bg-indigo-100 text-indigo-800',
+			event: 'bg-pink-100 text-pink-800'
 		};
 		return classes[type] ?? 'bg-gray-100 text-gray-800';
 	}
