@@ -195,11 +195,11 @@
 </section>
 
 <!-- Search & Filters -->
-<div class="mb-6 space-y-3">
+<div class="mb-6 space-y-4">
 	<div class="flex items-center gap-4">
 		<input
 			type="text"
-			placeholder="검색..."
+			placeholder="키워드로 검색하기"
 			bind:value={searchQuery}
 			onkeydown={(e) => e.key === 'Enter' && applyFilters()}
 			class="w-3/5 rounded-lg px-4 py-3 text-sm
