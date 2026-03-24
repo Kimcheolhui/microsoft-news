@@ -44,6 +44,14 @@
 	export function clear() {
 		fp?.clear();
 	}
+
+	export function setDates(from: string, to: string) {
+		if (from && to) {
+			fp?.setDate([from, to], false);
+		} else {
+			fp?.clear();
+		}
+	}
 </script>
 
 <input

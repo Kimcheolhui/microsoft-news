@@ -4,6 +4,7 @@
 	import FilterSelect from '$lib/components/FilterSelect.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { untrack } from 'svelte';
 
 	let updates: UpdateSummary[] = $state([]);
 	let sources: Source[] = $state([]);
@@ -59,19 +60,32 @@
 
 	let totalPages = $derived(Math.ceil(total / pageSize));
 
-	async function loadUpdates() {
+	function pushFiltersToURL() {
+		const params = new URLSearchParams();
+		if (searchQuery) params.set('q', searchQuery);
+		if (selectedSource) params.set('source', selectedSource);
+		if (selectedType) params.set('type', selectedType);
+		if (selectedCategory) params.set('category', selectedCategory);
+		if (dateFrom) params.set('date_from', dateFrom);
+		if (dateTo) params.set('date_to', dateTo);
+		if (currentPage > 1) params.set('page', String(currentPage));
+		const qs = params.toString();
+		goto(qs ? `?${qs}` : '/', { keepFocus: true, noScroll: true });
+	}
+
+	async function loadUpdatesFromParams(params: URLSearchParams) {
 		loading = true;
 		error = '';
 		try {
 			const data = await getUpdates({
-				page: currentPage,
+				page: parseInt(params.get('page') || '1', 10),
 				page_size: pageSize,
-				source_id: selectedSource || undefined,
-				update_type: selectedType || undefined,
-				category: selectedCategory || undefined,
-				q: searchQuery || undefined,
-				date_from: dateFrom || undefined,
-				date_to: dateTo || undefined
+				source_id: params.get('source') || undefined,
+				update_type: params.get('type') || undefined,
+				category: params.get('category') || undefined,
+				q: params.get('q') || undefined,
+				date_from: params.get('date_from') || undefined,
+				date_to: params.get('date_to') || undefined
 			});
 			updates = data.items;
 			total = data.total;
@@ -92,7 +106,7 @@
 
 	function applyFilters() {
 		currentPage = 1;
-		loadUpdates();
+		pushFiltersToURL();
 	}
 
 	function clearFilters() {
@@ -102,14 +116,14 @@
 		selectedCategory = '';
 		dateFrom = '';
 		dateTo = '';
-		datePickerRef?.clear();
 		currentPage = 1;
-		loadUpdates();
+		datePickerRef?.setDates('', '');
+		goto('/', { keepFocus: true, noScroll: true });
 	}
 
 	function goToPage(p: number) {
 		currentPage = p;
-		loadUpdates();
+		pushFiltersToURL();
 	}
 
 	function formatDate(dateStr: string | null): string {
@@ -176,9 +190,28 @@
 		return classes[type] ?? 'bg-gray-100 text-gray-800';
 	}
 
+	// Load sources once
 	$effect(() => {
 		loadSources();
-		loadUpdates();
+	});
+
+	// React to URL changes: sync filter state and load data
+	$effect(() => {
+		const params = page.url.searchParams;
+
+		searchQuery = params.get('q') || '';
+		selectedSource = params.get('source') || '';
+		selectedType = params.get('type') || '';
+		selectedCategory = params.get('category') || '';
+		dateFrom = params.get('date_from') || '';
+		dateTo = params.get('date_to') || '';
+		currentPage = parseInt(params.get('page') || '1', 10);
+
+		const df = params.get('date_from') || '';
+		const dt = params.get('date_to') || '';
+		untrack(() => datePickerRef?.setDates(df, dt));
+
+		loadUpdatesFromParams(params);
 	});
 </script>
 
