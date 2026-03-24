@@ -57,7 +57,7 @@
 <input
 	bind:this={inputEl}
 	type="text"
-	placeholder="날짜 범위 선택"
+	placeholder="Date Range"
 	readonly
 	class="box-border w-full rounded-lg bg-white px-3 text-sm cursor-pointer
 		focus:ring-1 focus:ring-[var(--color-primary)] focus:outline-none"
