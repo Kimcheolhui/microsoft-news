@@ -14,10 +14,12 @@ export interface UpdateSummary {
 	id: string;
 	source_id: string;
 	title: string;
+	title_ko: string | null;
 	summary: string | null;
+	summary_ko: string | null;
 	source_url: string;
 	published_date: string | null;
-	update_type: string | null;
+	update_type: string[] | null;
 	categories: string[] | null;
 	services_affected: string[] | null;
 	ingested_at: string;

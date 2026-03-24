@@ -16,7 +16,7 @@
 	let selectedSource = $state('');
 	let selectedType = $state('');
 
-	const updateTypes = ['new_feature', 'retirement', 'preview', 'ga', 'update'];
+	const updateTypes = ['new_feature', 'retirement', 'preview', 'ga', 'update', 'security', 'pricing', 'deprecation'];
 
 	let totalPages = $derived(Math.ceil(total / pageSize));
 
@@ -75,26 +75,32 @@
 		});
 	}
 
-	function typeLabel(type: string | null): string {
+	function typeLabel(type: string): string {
 		const labels: Record<string, string> = {
 			new_feature: '🆕 신규',
 			retirement: '🔴 종료',
 			preview: '🔵 프리뷰',
 			ga: '🟢 GA',
-			update: '🔄 업데이트'
+			update: '🔄 업데이트',
+			security: '🔒 보안',
+			pricing: '💰 가격',
+			deprecation: '⚠️ 중단 예고'
 		};
-		return type ? labels[type] ?? type : '';
+		return labels[type] ?? type;
 	}
 
-	function typeBadgeClass(type: string | null): string {
+	function typeBadgeClass(type: string): string {
 		const classes: Record<string, string> = {
 			new_feature: 'bg-emerald-100 text-emerald-800',
 			retirement: 'bg-red-100 text-red-800',
 			preview: 'bg-blue-100 text-blue-800',
 			ga: 'bg-green-100 text-green-800',
-			update: 'bg-amber-100 text-amber-800'
+			update: 'bg-amber-100 text-amber-800',
+			security: 'bg-purple-100 text-purple-800',
+			pricing: 'bg-orange-100 text-orange-800',
+			deprecation: 'bg-rose-100 text-rose-800'
 		};
-		return type ? classes[type] ?? 'bg-gray-100 text-gray-800' : '';
+		return classes[type] ?? 'bg-gray-100 text-gray-800';
 	}
 
 	$effect(() => {
@@ -181,19 +187,30 @@
 			>
 				<div class="flex items-start justify-between gap-3">
 					<div class="min-w-0 flex-1">
-						<h3 class="font-medium text-[var(--color-text)] truncate">{update.title}</h3>
-						{#if update.summary}
-							<p class="mt-1 text-sm text-[var(--color-text-muted)] line-clamp-2">{update.summary}</p>
+						<h3 class="font-medium text-[var(--color-text)] truncate">{update.title_ko || update.title}</h3>
+						{#if update.title_ko}
+							<p class="mt-0.5 text-xs text-[var(--color-text-muted)] truncate">{update.title}</p>
+						{/if}
+						{#if update.summary_ko || update.summary}
+							<p class="mt-1 text-sm text-[var(--color-text-muted)] line-clamp-2">{update.summary_ko || update.summary}</p>
 						{/if}
 					</div>
-					{#if update.update_type}
-						<span class="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium {typeBadgeClass(update.update_type)}">
-							{typeLabel(update.update_type)}
-						</span>
+					{#if update.update_type && update.update_type.length > 0}
+						<div class="shrink-0 flex flex-wrap gap-1 justify-end">
+							{#each update.update_type as type}
+								<span class="rounded-full px-2.5 py-0.5 text-xs font-medium {typeBadgeClass(type)}">
+									{typeLabel(type)}
+								</span>
+							{/each}
+						</div>
 					{/if}
 				</div>
 				<div class="mt-2 flex items-center gap-4 text-xs text-[var(--color-text-muted)]">
 					<span>{formatDate(update.published_date)}</span>
+					{#if update.categories && update.categories.length > 0}
+						<span>·</span>
+						<span>{update.categories.join(', ')}</span>
+					{/if}
 				</div>
 			</a>
 		{/each}

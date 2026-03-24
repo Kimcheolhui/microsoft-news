@@ -22,7 +22,9 @@ class Update(Base):
         UUID(as_uuid=True), ForeignKey("sources.id"), nullable=False
     )
     title: Mapped[str] = mapped_column(String, nullable=False)
+    title_ko: Mapped[str | None] = mapped_column(Text, nullable=True)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    summary_ko: Mapped[str | None] = mapped_column(Text, nullable=True)
     body: Mapped[str | None] = mapped_column(Text, nullable=True)
     source_url: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     published_date: Mapped[datetime | None] = mapped_column(
@@ -30,7 +32,7 @@ class Update(Base):
     )
     categories: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     services_affected: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    update_type: Mapped[str | None] = mapped_column(String, nullable=True)
+    update_type: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     raw_data: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     ingested_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

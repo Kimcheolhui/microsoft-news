@@ -36,15 +36,18 @@
 		});
 	}
 
-	function typeLabel(type: string | null): string {
+	function typeLabel(type: string): string {
 		const labels: Record<string, string> = {
 			new_feature: '🆕 신규 기능',
 			retirement: '🔴 서비스 종료',
 			preview: '🔵 프리뷰',
 			ga: '🟢 정식 출시 (GA)',
-			update: '🔄 업데이트'
+			update: '🔄 업데이트',
+			security: '🔒 보안',
+			pricing: '💰 가격 변경',
+			deprecation: '⚠️ 중단 예고'
 		};
-		return type ? labels[type] ?? type : '분류 없음';
+		return labels[type] ?? type;
 	}
 
 	function statusLabel(status: string): string {
@@ -82,11 +85,18 @@
 
 	<!-- Update header -->
 	<div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-6 mb-6">
-		<h1 class="text-2xl font-bold text-[var(--color-text)]">{update.title}</h1>
+		<h1 class="text-2xl font-bold text-[var(--color-text)]">{update.title_ko || update.title}</h1>
+		{#if update.title_ko}
+			<p class="mt-1 text-sm text-[var(--color-text-muted)]">{update.title}</p>
+		{/if}
 		<div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-[var(--color-text-muted)]">
 			<span>{formatDate(update.published_date)}</span>
-			<span>·</span>
-			<span>{typeLabel(update.update_type)}</span>
+			{#if update.update_type && update.update_type.length > 0}
+				<span>·</span>
+				{#each update.update_type as type}
+					<span>{typeLabel(type)}</span>
+				{/each}
+			{/if}
 			{#if update.source_url}
 				<span>·</span>
 				<a href={update.source_url} target="_blank" rel="noopener"
@@ -95,8 +105,8 @@
 				</a>
 			{/if}
 		</div>
-		{#if update.summary}
-			<p class="mt-4 text-[var(--color-text-muted)]">{update.summary}</p>
+		{#if update.summary_ko || update.summary}
+			<p class="mt-4 text-[var(--color-text-muted)]">{update.summary_ko || update.summary}</p>
 		{/if}
 	</div>
 

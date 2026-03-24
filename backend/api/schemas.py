@@ -32,12 +32,14 @@ class UpdateSummaryOut(BaseModel):
     id: UUID
     source_id: UUID
     title: str
+    title_ko: str | None = None
     summary: str | None = None
+    summary_ko: str | None = None
     source_url: str
     published_date: datetime | None = None
-    update_type: str | None = None
-    categories: dict | list | None = None
-    services_affected: dict | list | None = None
+    update_type: list[str] | None = None
+    categories: list[str] | None = None
+    services_affected: list[str] | None = None
     ingested_at: datetime
 
 

@@ -153,6 +153,43 @@ def generate_all(force: bool):
     click.echo(f"\nDone: {completed} completed, {failed} failed, {skipped} skipped")
 
 
+@cli.group()
+def enrich():
+    """Enrich updates with classification and Korean translation."""
+
+
+@enrich.command("pending")
+@click.option("--limit", type=int, default=None, help="Max updates to process.")
+@click.option("--dry-run", is_flag=True, help="Show what would be processed.")
+def enrich_pending(limit: int | None, dry_run: bool):
+    """Enrich updates that haven't been classified yet."""
+    import asyncio
+
+    from ingest.db.session import get_session
+    from .pipeline.enrichment import run_enrichment
+
+    with get_session() as session:
+        result = asyncio.run(run_enrichment(session, limit=limit, dry_run=dry_run))
+
+    click.echo(f"Total: {result['total']}, Enriched: {result['enriched']}, Failed: {result['failed']}")
+
+
+@enrich.command("all")
+@click.option("--force", is_flag=True, help="Re-enrich already classified updates.")
+@click.option("--limit", type=int, default=None, help="Max updates to process.")
+def enrich_all(force: bool, limit: int | None):
+    """Enrich all updates (use --force to re-classify)."""
+    import asyncio
+
+    from ingest.db.session import get_session
+    from .pipeline.enrichment import run_enrichment
+
+    with get_session() as session:
+        result = asyncio.run(run_enrichment(session, force=force, limit=limit))
+
+    click.echo(f"Total: {result['total']}, Enriched: {result['enriched']}, Failed: {result['failed']}")
+
+
 @cli.command()
 def status():
     """Show report generation status."""
