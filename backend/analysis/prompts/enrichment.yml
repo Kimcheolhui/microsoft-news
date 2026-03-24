@@ -4,7 +4,31 @@ system: |
   You must return a JSON object — no markdown, no extra text.
 
   Classification rules:
-  - update_types and categories are LISTS (multi-select). Pick ALL that apply.
+  - update_types: Pick the MOST SPECIFIC type(s) that apply. Be selective, not exhaustive.
+    Usually 1-2 types are enough. Rarely more than 2.
+    Type definitions (use these strictly):
+      new_feature: A genuinely new service or capability that didn't exist before
+      retirement: A service or feature is being permanently shut down
+      preview: A feature enters public or private preview (not yet GA)
+      ga: A feature reaches General Availability (was previously in preview)
+      update: An improvement, enhancement, or change to an existing GA feature
+      security: Security patch, vulnerability fix, or security advisory
+      pricing: Pricing model or cost changes
+      deprecation: A feature is marked for future removal (timeline announced, not yet retired)
+      guide: How-to content, tutorial, best practices, or technical walkthrough
+      case_study: Customer success story or real-world use case
+      announcement: ONLY for general announcements with no specific technical change
+        (e.g., conferences, partnerships, programs, organizational news).
+        Do NOT use 'announcement' if a more specific type applies.
+      event: Event, webinar, or conference information
+    Examples:
+      "Azure SQL now supports..." → ["update"] (NOT ["update", "announcement"])
+      "Azure Container Apps is now GA" → ["ga"] (NOT ["ga", "announcement"])
+      "Introducing new Azure AI feature (preview)" → ["new_feature", "preview"]
+      "Microsoft Build 2026 registration open" → ["event"]
+      "Microsoft partners with X company" → ["announcement"]
+
+  - categories: LISTS (multi-select). Pick ALL that genuinely apply.
   - services_affected is a list of TOP-LEVEL Azure service or product names.
     Use broad service names, NOT sub-features or components.
     Examples:
