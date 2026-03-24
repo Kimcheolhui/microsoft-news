@@ -35,7 +35,7 @@ ingest = "ingest.__main__:cli"
 analysis = "analysis.__main__:cli"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["backend"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+:root {
+	--color-bg: #f8fafc;
+	--color-surface: #ffffff;
+	--color-primary: #0078d4;
+	--color-primary-hover: #106ebe;
+	--color-text: #1e293b;
+	--color-text-muted: #64748b;
+	--color-border: #e2e8f0;
+}
