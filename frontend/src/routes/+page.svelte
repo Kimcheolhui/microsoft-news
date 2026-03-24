@@ -226,7 +226,7 @@
 			적용
 		</button>
 	</div>
-	<div class="flex items-center gap-4">
+	<div class="flex items-center gap-8">
 		<div class="w-0 flex-1">
 			<FilterSelect
 				options={sourceOptions}
