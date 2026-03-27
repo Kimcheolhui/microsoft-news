@@ -1,4 +1,4 @@
-"""Shared test fixtures for azure-new test suite."""
+"""Shared test fixtures for microsoft-news test suite."""
 
 from __future__ import annotations
 

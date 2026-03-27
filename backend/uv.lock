@@ -48,7 +48,7 @@ wheels = [
 ]
 
 [[package]]
-name = "azure-news"
+name = "microsoft-news"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
