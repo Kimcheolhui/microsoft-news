@@ -7,12 +7,16 @@ from .azure_updates_rss import AzureUpdatesRssScraper
 from .azure_blog import AzureBlogScraper
 from .fabric_blog import FabricBlogScraper
 from .github_blog import GitHubBlogScraper
+from .microsoft_blog import MicrosoftBlogScraper
+from .tech_community import TechCommunityScraper
 
 SCRAPERS: dict[str, type[BaseScraper]] = {
     "azure-updates-rss": AzureUpdatesRssScraper,
     "azure-blog": AzureBlogScraper,
     "fabric-blog": FabricBlogScraper,
     "github-blog": GitHubBlogScraper,
+    "microsoft-blog": MicrosoftBlogScraper,
+    "microsoft-tech-community": TechCommunityScraper,
 }
 
 
