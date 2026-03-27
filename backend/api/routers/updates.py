@@ -22,7 +22,7 @@ router = APIRouter(prefix="/updates", tags=["updates"])
 def list_updates(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
-    source: str | None = None,
+    source: str | None = Query(None, description="Comma-separated source names"),
     update_type: str | None = None,
     category: str | None = None,
     q: str | None = None,
@@ -33,8 +33,9 @@ def list_updates(
     stmt = select(Update)
 
     if source:
+        source_names = [s.strip() for s in source.split(",") if s.strip()]
         stmt = stmt.join(Source, Update.source_id == Source.id).where(
-            Source.name == source
+            Source.name.in_(source_names)
         )
     if update_type:
         stmt = stmt.where(Update.update_type.contains(cast([update_type], JSONB)))

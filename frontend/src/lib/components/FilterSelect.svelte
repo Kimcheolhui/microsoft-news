@@ -45,17 +45,17 @@
 		--border-radius="0.5rem"
 		--border="none"
 		--border-hover="none"
-		--border-focused="1px solid var(--color-primary)"
-		--background="#fff"
-		--list-background="#fff"
+		--border-focused="none"
+		--background="var(--color-surface)"
+		--list-background="var(--color-surface)"
 		--list-border="none"
 		--list-border-radius="0.5rem"
-		--list-shadow="0 4px 12px rgba(0,0,0,0.1)"
-		--item-hover-bg="rgba(0,120,212,0.06)"
-		--item-is-active-bg="rgba(0,120,212,0.1)"
+		--list-shadow="var(--shadow-lg)"
+		--item-hover-bg="var(--color-primary-subtle)"
+		--item-is-active-bg="var(--color-primary-muted)"
 		--item-is-active-color="var(--color-text)"
 		--font-size="0.875rem"
-		--height="48px"
+		--height="44px"
 		--padding="0 8px 0 12px"
 		--placeholder-color="var(--color-text-muted)"
 		--chevron-color="var(--color-text-muted)"
@@ -66,7 +66,19 @@
 <style>
 	.filter-select {
 		min-width: 0;
-		box-shadow: 0 1px 6px rgba(0, 0, 0, 0.14);
+		box-shadow: none;
 		border-radius: 0.5rem;
+		border: 1px solid var(--color-border);
+		cursor: pointer;
+	}
+	.filter-select:focus-within {
+		outline: 2px solid var(--color-primary);
+		outline-offset: -1px;
+	}
+	.filter-select :global(.svelte-select) {
+		cursor: pointer;
+	}
+	.filter-select :global(.svelte-select input) {
+		cursor: pointer;
 	}
 </style>

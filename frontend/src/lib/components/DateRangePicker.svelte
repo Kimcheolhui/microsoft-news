@@ -59,9 +59,9 @@
 	type="text"
 	placeholder="Date Range"
 	readonly
-	class="box-border w-full rounded-lg bg-white px-3 text-sm cursor-pointer
-		focus:ring-1 focus:ring-[var(--color-primary)] focus:outline-none"
-	style="height: 48px; line-height: 48px; box-shadow: 0 1px 6px rgba(0,0,0,0.14); border: none;"
+	class="box-border w-full rounded-lg bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text)] cursor-pointer
+		focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none"
+	style="height: 44px; line-height: 44px; border: 1px solid var(--color-border);"
 />
 
 <style>
